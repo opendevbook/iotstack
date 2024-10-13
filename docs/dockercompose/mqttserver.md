@@ -24,6 +24,26 @@ services:
       - ./log:/mosquitto/log:Z
 ```
 
+**Create file /config/mosquitto.conf**
+```
+allow_anonymous false
+listener 1883
+listener 9001
+protocol websockets
+persistence true
+password_file /mosquitto/config/passwd
+persistence_file mosquitto.db
+persistence_location /mosquitto/data/
+log_dest file /mosquitto/log/mosquitto.log
+log_dest stderr
+```
+
+**Create file /conf/passwd  keep username and password**
+```
+mqttadmin:1234P@ssword
+```
+
+
 [https://hub.docker.com/_/eclipse-mosquitto](https://hub.docker.com/_/eclipse-mosquitto)
 
 ![](../assets/images/mqtt_images.png)
