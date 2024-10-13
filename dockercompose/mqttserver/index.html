@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>mqtt server - IoT Server Stacks</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "mqtt server";
+        var mkdocs_page_input_path = "dockercompose/mqttserver.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> IoT Server Stacks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Welcome to MkDocs</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Dockercompose</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">mqtt server</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">IoT Server Stacks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Dockercompose</li>
+      <li class="breadcrumb-item active">mqtt server</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mqtt-server">mqtt server</h1>
+<p><strong>Step 1 Create folder</strong></p>
+<pre><code>mkdir mqttserver
+code docker-compose.yml
+</code></pre>
+<p><strong>Step 2 Create file docker-compose.yml</strong></p>
+<pre><code>services:
+  mosquitto:
+    user: &quot;0:0&quot;
+    image: eclipse-mosquitto:2.0.19
+    hostname: mosquitto
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - &quot;1883:1883&quot;
+      - &quot;9001:9001&quot;
+    volumes:
+      - ./config:/mosquitto/config:Z
+      - ./data:/mosquitto/data:Z
+      - ./log:/mosquitto/log:Z
+</code></pre>
+<p><strong>Create file /config/mosquitto.conf</strong></p>
+<pre><code>allow_anonymous false
+listener 1883
+listener 9001
+protocol websockets
+persistence true
+password_file /mosquitto/config/passwd
+persistence_file mosquitto.db
+persistence_location /mosquitto/data/
+log_dest file /mosquitto/log/mosquitto.log
+log_dest stderr
+</code></pre>
+<p><strong>Create file /conf/passwd  keep username and password</strong></p>
+<pre><code>mqttadmin:1234P@ssword
+</code></pre>
+<p><a href="https://hub.docker.com/_/eclipse-mosquitto">https://hub.docker.com/_/eclipse-mosquitto</a></p>
+<p><img alt="" src="../../assets/images/mqtt_images.png" /></p>
+<p><strong>Directories</strong>
+Three directories have been created in the image to be used for configuration, persistent storage and logs.</p>
+<pre><code>/mosquitto/config
+/mosquitto/data
+/mosquitto/log
+</code></pre>
+<p>Click <a href="https://github.com/eclipse/mosquitto/blob/e96ddfc6e58f7087b9fa57a717d7f56d2c00f9fe/docker/2.0-openssl/Dockerfile">Dockerfile</a></p>
+<p><img alt="" src="../../assets/images/mqtt_dockerfile.png" /></p>
+<ul>
+<li><strong>CMD ["/usr/sbin/mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]</strong></li>
+</ul>
+<p>Run Docker compose up </p>
+<pre><code>docker compose up -d
+</code></pre>
+<p><img alt="" src="../../assets/images/mqtt_dockercompose_up.png" /></p>
+<p>Select docker.io registroy then enter. docker compose will download image</p>
+<p><img alt="" src="../../assets/images/mqtt_dockercomposeup_done.png" /></p>
+<p>Run Docker compose ps</p>
+<p><img alt="" src="../../assets/images/mqtt_dockercompose_ps.png" /></p>
+<p><strong>Step 3 Security Configuration</strong>
+- create username and password
+Set the Mosquitto configuration file is <code>/etc/mosquitto/mosquitto.conf</code></p>
+<ul>
+<li>Create file <code>/mosquitto/mosquitto.conf</code> in project folder</li>
+</ul>
+<pre><code>code ./mosquitto/mosquitto.conf
+</code></pre>
+<p>paste this text to file content:</p>
+<pre><code>allow_anonymous false
+password_file /etc/mosquitto/passwd
+</code></pre>
+<p>Explain:
+- <strong>allow_anonymous false</strong>  Disables anonymous connections
+- <strong>password_file  /etc/mosquitto/passwd</strong> location of password file</p>
+<p><strong>Step 4 Edit the password file with this command:</strong></p>
+<pre><code>code ./mosquitto/passwd
+</code></pre>
+<p>Enter username/password in format:</p>
+<pre><code>username:password
+</code></pre>
+<p>Example:</p>
+<pre><code>mqttuser:P@ssw0rd
+</code></pre>
+<p><strong>Step 5 Mosquitto User: Encript the password</strong> </p>
+<p><img alt="" src="../../assets/images/mqtt_invalid_password.png" /></p>
+<pre><code>docker  compose exec mosquitto sh
+</code></pre>
+<p>Run command mosquitto_passwd in container</p>
+<pre><code>docker compose exec mosquitto mosquitto_passwd -U /mosquitto/config/passwd
+</code></pre>
+<pre><code>docker  compose exec mosquitto sh
+/# cat /mosquitto/config/passwd
+
+/# exit
+</code></pre>
+<p>Example:</p>
+<pre><code>mqttuser:$7$101$n9DHRNjU7WBkloMP$t9w87LhuY5PAkIiWpq8jrT7oDW/ALECt+4ICzRjn/G9TAaFqeBt2f2WDC8HGJCgOQ1zEBK/ERxjWWRElnp9Dlw==
+</code></pre>
+<p>You will see the password encrypted.
+<strong>Step6 Restart Mosquitto</strong></p>
+<pre><code>docker compose restart
+</code></pre>
+<p><strong>Step7 Add user</strong>
+Add other use</p>
+<pre><code>docker exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd user password
+</code></pre>
+<p>https://stackoverflow.com/questions/78590294/how-to-fix-user-creation-issue-in-eclipse-mosquitto-docker-deployment-without-re</p>
+<p>https://medium.com/@tomer.klein/docker-compose-and-mosquitto-mqtt-simplifying-broker-deployment-7aaf469c07ee</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Welcome to MkDocs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
